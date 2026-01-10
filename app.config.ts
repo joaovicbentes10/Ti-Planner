@@ -31,6 +31,14 @@ const config: ExpoConfig = {
   scheme: env.scheme,
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
+  
+  // ADICIONADO MANUALMENTE PARA O EAS FUNCIONAR:
+  extra: {
+    eas: {
+      projectId: "1622e256-d2fa-4f3e-9d5b-da735ba15e4a"
+    }
+  },
+
   ios: {
     supportsTablet: true,
     bundleIdentifier: env.iosBundleId,
