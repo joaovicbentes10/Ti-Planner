@@ -13,7 +13,7 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 export default function StatsScreen() {
   const colors = useColors();
   const router = useRouter();
-  const { tasks, projects, pomodoroSessions, dailyStats } = useTaskContext();
+  const { tasks, projects } = useTaskContext();
 
   const stats = useMemo(() => {
     const totalTasks = tasks.length;
@@ -27,12 +27,6 @@ export default function StatsScreen() {
     const mediumPriority = tasks.filter(t => t.priority === 'medium' && t.status !== 'done').length;
     const lowPriority = tasks.filter(t => t.priority === 'low' && t.status !== 'done').length;
 
-    // Pomodoro stats
-    const workSessions = pomodoroSessions.filter(s => s.type === 'work');
-    const totalPomodoros = workSessions.length;
-    const totalFocusMinutes = workSessions.reduce((acc, s) => acc + s.duration, 0);
-    const totalFocusHours = Math.round(totalFocusMinutes / 60 * 10) / 10;
-
     // Weekly stats (last 7 days)
     const today = new Date();
     const weekAgo = new Date(today);
@@ -44,9 +38,9 @@ export default function StatsScreen() {
       return completedDate >= weekAgo && completedDate <= today;
     }).length;
 
-    const weeklyPomodoros = workSessions.filter(s => {
-      const sessionDate = new Date(s.completedAt);
-      return sessionDate >= weekAgo && sessionDate <= today;
+    const weeklyCreated = tasks.filter(t => {
+      const createdDate = new Date(t.createdAt);
+      return createdDate >= weekAgo && createdDate <= today;
     }).length;
 
     // Completion rate
@@ -83,17 +77,15 @@ export default function StatsScreen() {
       highPriority,
       mediumPriority,
       lowPriority,
-      totalPomodoros,
-      totalFocusHours,
       weeklyCompleted,
-      weeklyPomodoros,
+      weeklyCreated,
       completionRate,
       totalEstimatedHours,
       totalActualHours,
       overdueTasks,
       avgTasksPerDay,
     };
-  }, [tasks, pomodoroSessions]);
+  }, [tasks]);
 
   // Project stats
   const projectStats = useMemo(() => {
@@ -132,8 +124,8 @@ export default function StatsScreen() {
           </View>
           <View style={[styles.overviewCard, { backgroundColor: colors.warning + '15' }]}>
             <IconSymbol name="clock.fill" size={24} color={colors.warning} />
-            <Text style={[styles.overviewValue, { color: colors.foreground }]}>{stats.totalFocusHours}h</Text>
-            <Text style={[styles.overviewLabel, { color: colors.muted }]}>Tempo de Foco</Text>
+            <Text style={[styles.overviewValue, { color: colors.foreground }]}>{stats.totalEstimatedHours}h</Text>
+            <Text style={[styles.overviewLabel, { color: colors.muted }]}>Horas Estimadas</Text>
           </View>
           <View style={[styles.overviewCard, { backgroundColor: colors.error + '15' }]}>
             <IconSymbol name="exclamationmark.triangle.fill" size={24} color={colors.error} />
@@ -152,8 +144,8 @@ export default function StatsScreen() {
             </View>
             <View style={[styles.weeklyDivider, { backgroundColor: colors.border }]} />
             <View style={styles.weeklyStat}>
-              <Text style={[styles.weeklyValue, { color: colors.primary }]}>{stats.weeklyPomodoros}</Text>
-              <Text style={[styles.weeklyLabel, { color: colors.muted }]}>Sessões Pomodoro</Text>
+              <Text style={[styles.weeklyValue, { color: colors.primary }]}>{stats.weeklyCreated}</Text>
+              <Text style={[styles.weeklyLabel, { color: colors.muted }]}>Tarefas Criadas</Text>
             </View>
             <View style={[styles.weeklyDivider, { backgroundColor: colors.border }]} />
             <View style={styles.weeklyStat}>
@@ -244,23 +236,6 @@ export default function StatsScreen() {
             ))}
           </View>
         )}
-
-        {/* Pomodoro Stats */}
-        <View style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Pomodoro</Text>
-          <View style={styles.pomodoroStats}>
-            <View style={styles.pomodoroStat}>
-              <IconSymbol name="flame.fill" size={28} color={colors.warning} />
-              <Text style={[styles.pomodoroValue, { color: colors.foreground }]}>{stats.totalPomodoros}</Text>
-              <Text style={[styles.pomodoroLabel, { color: colors.muted }]}>Sessões Totais</Text>
-            </View>
-            <View style={styles.pomodoroStat}>
-              <IconSymbol name="clock.fill" size={28} color={colors.primary} />
-              <Text style={[styles.pomodoroValue, { color: colors.foreground }]}>{stats.totalFocusHours}h</Text>
-              <Text style={[styles.pomodoroLabel, { color: colors.muted }]}>Tempo de Foco</Text>
-            </View>
-          </View>
-        </View>
 
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -432,21 +407,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     width: 40,
     textAlign: 'right',
-  },
-  pomodoroStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  pomodoroStat: {
-    alignItems: 'center',
-  },
-  pomodoroValue: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginTop: 8,
-  },
-  pomodoroLabel: {
-    fontSize: 12,
-    marginTop: 4,
   },
 });

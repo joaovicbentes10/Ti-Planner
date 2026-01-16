@@ -16,7 +16,6 @@ const MAPPING = {
   "house.fill": "home",
   "checklist": "checklist",
   "square.grid.2x2": "grid-view",
-  "timer": "timer",
   "ellipsis": "more-horiz",
   "gearshape.fill": "settings",
   "chart.bar.fill": "bar-chart",
@@ -55,7 +54,7 @@ const MAPPING = {
   "exclamationmark.triangle.fill": "warning",
   "info.circle.fill": "info",
   
-  // Pomodoro
+  // Controls
   "play.fill": "play-arrow",
   "pause.fill": "pause",
   "stop.fill": "stop",

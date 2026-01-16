@@ -43,24 +43,8 @@ export interface Project {
   createdAt: string;
 }
 
-export interface PomodoroSession {
-  id: string;
-  taskId?: string;
-  duration: number;
-  completedAt: string;
-  type: 'work' | 'short_break' | 'long_break';
-}
-
-export interface PomodoroSettings {
-  workDuration: number;
-  shortBreakDuration: number;
-  longBreakDuration: number;
-  sessionsUntilLongBreak: number;
-}
-
 export interface AppSettings {
   theme: 'light' | 'dark' | 'system';
-  pomodoro: PomodoroSettings;
   notifications: boolean;
 }
 
@@ -68,8 +52,6 @@ export interface DailyStats {
   date: string;
   tasksCreated: number;
   tasksCompleted: number;
-  pomodoroSessions: number;
-  focusMinutes: number;
 }
 
 // Predefined tags for IT tasks

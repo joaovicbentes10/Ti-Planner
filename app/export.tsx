@@ -12,7 +12,7 @@ import * as Haptics from 'expo-haptics';
 export default function ExportScreen() {
   const colors = useColors();
   const router = useRouter();
-  const { tasks, projects, pomodoroSessions } = useTaskContext();
+  const { tasks, projects } = useTaskContext();
   
   const [exporting, setExporting] = useState(false);
 
@@ -42,7 +42,6 @@ export default function ExportScreen() {
     tasks: tasks.length,
     completedTasks: tasks.filter(t => t.status === 'done').length,
     projects: projects.length,
-    pomodoros: pomodoroSessions.filter(s => s.type === 'work').length,
   };
 
   return (
@@ -84,11 +83,6 @@ export default function ExportScreen() {
               <IconSymbol name="folder.fill" size={20} color={colors.warning} />
               <Text style={[styles.summaryValue, { color: colors.foreground }]}>{stats.projects}</Text>
               <Text style={[styles.summaryLabel, { color: colors.muted }]}>Projetos</Text>
-            </View>
-            <View style={styles.summaryItem}>
-              <IconSymbol name="flame.fill" size={20} color={colors.error} />
-              <Text style={[styles.summaryValue, { color: colors.foreground }]}>{stats.pomodoros}</Text>
-              <Text style={[styles.summaryLabel, { color: colors.muted }]}>Pomodoros</Text>
             </View>
           </View>
         </View>
