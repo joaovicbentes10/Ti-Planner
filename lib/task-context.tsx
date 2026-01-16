@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback, ReactNode } from 'react';
-import { Task, Project, AppSettings, PomodoroSession, DailyStats } from './types';
+import { Task, Project, AppSettings, DailyStats } from './types';
 import * as store from './store';
 import { runMigrations } from './migrations';
 
@@ -7,7 +7,6 @@ interface AppState {
   tasks: Task[];
   projects: Project[];
   settings: AppSettings;
-  pomodoroSessions: PomodoroSession[];
   dailyStats: DailyStats[];
   isLoading: boolean;
   selectedProjectId: string | null;
@@ -25,7 +24,6 @@ type Action =
   | { type: 'UPDATE_PROJECT'; payload: Project }
   | { type: 'DELETE_PROJECT'; payload: string }
   | { type: 'SET_SETTINGS'; payload: AppSettings }
-  | { type: 'ADD_POMODORO_SESSION'; payload: PomodoroSession }
   | { type: 'UPDATE_DAILY_STATS'; payload: DailyStats }
   | { type: 'SET_SELECTED_PROJECT'; payload: string | null };
 
@@ -34,15 +32,8 @@ const initialState: AppState = {
   projects: [],
   settings: {
     theme: 'system',
-    pomodoro: {
-      workDuration: 25,
-      shortBreakDuration: 5,
-      longBreakDuration: 15,
-      sessionsUntilLongBreak: 4,
-    },
     notifications: true,
   },
-  pomodoroSessions: [],
   dailyStats: [],
   isLoading: true,
   selectedProjectId: null,
@@ -82,8 +73,6 @@ function reducer(state: AppState, action: Action): AppState {
       };
     case 'SET_SETTINGS':
       return { ...state, settings: action.payload };
-    case 'ADD_POMODORO_SESSION':
-      return { ...state, pomodoroSessions: [action.payload, ...state.pomodoroSessions] };
     case 'UPDATE_DAILY_STATS':
       const existingIndex = state.dailyStats.findIndex(s => s.date === action.payload.date);
       if (existingIndex >= 0) {
@@ -109,7 +98,6 @@ interface TaskContextValue extends AppState {
   updateProject: (projectId: string, updates: Partial<Project>) => Promise<void>;
   deleteProject: (projectId: string) => Promise<void>;
   updateSettings: (settings: Partial<AppSettings>) => Promise<void>;
-  addPomodoroSession: (session: Omit<PomodoroSession, 'id' | 'completedAt'>) => Promise<void>;
   setSelectedProject: (projectId: string | null) => void;
   refreshData: () => Promise<void>;
   getTasksByProject: (projectId: string | null) => Task[];
@@ -130,16 +118,15 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       // Run migrations before loading data
       await runMigrations();
       
-      const [tasks, projects, settings, pomodoroSessions, dailyStats] = await Promise.all([
+      const [tasks, projects, settings, dailyStats] = await Promise.all([
         store.getTasks(),
         store.getProjects(),
         store.getSettings(),
-        store.getPomodoroSessions(),
         store.getDailyStats(),
       ]);
       dispatch({
         type: 'LOAD_DATA',
-        payload: { tasks, projects, settings, pomodoroSessions, dailyStats },
+        payload: { tasks, projects, settings, dailyStats },
       });
     } catch (error) {
       console.error('Failed to load data:', error);
@@ -223,23 +210,8 @@ export function TaskProvider({ children }: { children: ReactNode }) {
 
   const updateSettings = useCallback(async (updates: Partial<AppSettings>) => {
     const newSettings = { ...state.settings, ...updates };
-    if (updates.pomodoro) {
-      newSettings.pomodoro = { ...state.settings.pomodoro, ...updates.pomodoro };
-    }
     await store.saveSettings(newSettings);
     dispatch({ type: 'SET_SETTINGS', payload: newSettings });
-  }, []);
-
-  const addPomodoroSession = useCallback(async (session: Omit<PomodoroSession, 'id' | 'completedAt'>) => {
-    const newSession = await store.addPomodoroSession(session);
-    dispatch({ type: 'ADD_POMODORO_SESSION', payload: newSession });
-    if (session.type === 'work') {
-      const stats = await store.updateDailyStats({ 
-        pomodoroSessions: 1, 
-        focusMinutes: session.duration 
-      });
-      dispatch({ type: 'UPDATE_DAILY_STATS', payload: stats });
-    }
   }, []);
 
   const setSelectedProject = useCallback((projectId: string | null) => {
@@ -307,7 +279,6 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     updateProject,
     deleteProject,
     updateSettings,
-    addPomodoroSession,
     setSelectedProject,
     refreshData: loadData,
     getTasksByProject,

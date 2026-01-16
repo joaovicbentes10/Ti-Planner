@@ -38,13 +38,10 @@ Visualização em quadro Kanban com colunas de status (To Do, In Progress, Revie
 ### 5. Calendário (Calendar)
 Visualização de tarefas por data com suporte a visualização mensal e semanal.
 
-### 6. Timer Pomodoro
-Timer de produtividade com técnica Pomodoro (25min trabalho, 5min pausa).
-
-### 7. Estatísticas (Stats)
+### 6. Estatísticas (Stats)
 Métricas de produtividade, tarefas concluídas, tempo gasto, gráficos de progresso.
 
-### 8. Configurações (Settings)
+### 7. Configurações (Settings)
 Preferências do app, temas, notificações, backup de dados.
 
 ## Conteúdo e Funcionalidades por Tela
@@ -54,7 +51,7 @@ Preferências do app, temas, notificações, backup de dados.
 - **Resumo do Dia**: Cards com contadores (Tarefas Hoje, Em Progresso, Concluídas)
 - **Tarefas Urgentes**: Lista das 5 tarefas mais urgentes/vencendo
 - **Progresso Semanal**: Barra de progresso visual
-- **Acesso Rápido**: Botões para criar tarefa, iniciar Pomodoro
+- **Acesso Rápido**: Botões para criar tarefa e acesso ao Kanban
 
 ### Tarefas (Tasks)
 - **Barra de Busca**: Pesquisa por título ou descrição
@@ -92,24 +89,15 @@ Preferências do app, temas, notificações, backup de dados.
 - **Lista do Dia**: Ao tocar em um dia, mostra tarefas daquela data
 - **Adicionar**: Botão para criar tarefa na data selecionada
 
-### Timer Pomodoro
-- **Timer Circular**: Contagem regressiva visual
-- **Controles**: Play/Pause, Reset, Skip
-- **Sessões**: Contador de pomodoros completados
-- **Configuração**: Duração do trabalho, pausa curta, pausa longa
-- **Tarefa Vinculada**: Selecionar tarefa para rastrear tempo
-- **Som/Vibração**: Notificação ao finalizar
-
 ### Estatísticas
 - **Período**: Seletor (Hoje, Semana, Mês, Ano)
 - **Cards de Métricas**: Tarefas criadas, concluídas, taxa de conclusão
 - **Gráfico de Barras**: Tarefas por dia da semana
 - **Distribuição**: Pizza chart por status ou prioridade
-- **Tempo Focado**: Total de pomodoros/horas
+- **Tempo Focado**: Total de horas produtivas
 
 ### Configurações
 - **Aparência**: Tema (Claro, Escuro, Sistema)
-- **Pomodoro**: Durações personalizadas
 - **Notificações**: Lembretes de tarefas
 - **Dados**: Exportar/Importar JSON
 - **Sobre**: Versão, créditos
@@ -128,14 +116,6 @@ Preferências do app, temas, notificações, backup de dados.
 2. Animação de check com haptic feedback
 3. Tarefa move para status "Done"
 4. Contador de concluídas atualiza
-
-### Usar Pomodoro
-1. Vai para tela Pomodoro
-2. Opcionalmente seleciona tarefa
-3. Toca em Play
-4. Timer inicia contagem regressiva
-5. Ao finalizar, notificação + vibração
-6. Pausa automática inicia
 
 ### Visualizar Kanban
 1. Acessa aba Kanban
@@ -184,12 +164,6 @@ interface Project {
   createdAt: string;
 }
 
-interface PomodoroSession {
-  id: string;
-  taskId?: string;
-  duration: number; // minutes
-  completedAt: string;
-}
 ```
 
 ## Navegação
@@ -201,7 +175,6 @@ O app utiliza navegação por tabs na parte inferior com 5 abas principais:
 | Home | house.fill | Dashboard |
 | Tasks | checklist | Lista de Tarefas |
 | Kanban | square.grid.2x2 | Quadro Kanban |
-| Timer | timer | Pomodoro |
 | More | ellipsis | Menu com Projetos, Calendário, Stats, Settings |
 
 ## Componentes Reutilizáveis
@@ -212,6 +185,5 @@ O app utiliza navegação por tabs na parte inferior com 5 abas principais:
 - **StatusChip**: Chip de status
 - **TagChip**: Tag colorida
 - **ProjectBadge**: Badge com cor do projeto
-- **CircularProgress**: Timer circular animado
 - **StatCard**: Card de estatística
 - **EmptyState**: Estado vazio com ilustração

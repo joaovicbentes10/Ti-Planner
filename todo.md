@@ -6,7 +6,7 @@
 - [x] Atualizar app.config.ts com nome e branding
 
 ## Estrutura de Navegação
-- [x] Configurar tabs (Home, Tasks, Kanban, Timer, More)
+- [x] Configurar tabs (Home, Tasks, Kanban, More)
 - [x] Mapear ícones no icon-symbol.tsx
 - [x] Criar telas base para cada tab
 
@@ -59,14 +59,6 @@
 - [x] Indicadores de tarefas por dia
 - [x] Lista de tarefas do dia selecionado
 
-## Tela Timer Pomodoro
-- [x] Timer circular animado
-- [x] Controles (play, pause, reset)
-- [x] Contador de sessões
-- [x] Configuração de durações
-- [x] Vinculação com tarefa
-- [x] Notificação sonora/vibração
-
 ## Tela de Estatísticas
 - [x] Cards de métricas
 - [x] Distribuição por status/prioridade
@@ -75,7 +67,6 @@
 
 ## Tela de Configurações
 - [x] Seletor de tema
-- [x] Configurações do Pomodoro
 - [x] Toggle de notificações
 - [x] Exportar dados
 - [x] Informações do app
@@ -100,7 +91,6 @@
 - [x] Quick actions para mudar status de tarefa sem editar
 - [x] Seletor de cores corporativas para projetos
 - [x] Modais de confirmação customizados (não padrão do Android)
-- [x] Reposicionar timer Pomodoro (acima das abas)
 - [x] Corrigir proporções do calendário
 - [x] Testes visuais completos e correção de bugs
 
@@ -117,7 +107,6 @@
 
 ## Bugs Reportados (v2.1 - Correção)
 - [x] Data de vencimento não abre calendário ao clicar
-- [x] Timer Pomodoro bugado - entra em outras opções
 - [x] Melhorar tela inicial (onboarding)
 - [x] Revisar funcionalidades que não estão funcionando
 - [ ] Quick actions para status não está integrado
@@ -149,7 +138,6 @@
 ## Bugs Críticos v2.6
 - [x] Remover ícone padrão do Expo que aparece antes do splash customizado
 - [x] Ordenar tarefas do projeto: não concluídas no topo, concluídas embaixo
-- [x] Timer bugado - relógio mesclado com as opções de modo
 - [x] Modal de novo projeto - botões salvar/cancelar inacessíveis no topo
 - [x] Adicionar sistema de comentários em tarefas
 - [x] Edição rápida de prioridade e status na tela de detalhes
@@ -166,6 +154,5 @@
 
 
 ## Mudanças Solicitadas pelo Usuário (v2.6.3)
-- [x] Remover aba Timer do aplicativo
 - [x] Renomear app para "TI Planner"
 - [x] Corrigir layout de seleção de cores do projeto (cortado)

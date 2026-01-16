@@ -5,12 +5,12 @@ import { ScreenContainer } from '@/components/screen-container';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColors } from '@/hooks/use-colors';
 import { useTaskContext } from '@/lib/task-context';
-import { STATUS_CONFIG, PRIORITY_CONFIG, Priority } from '@/lib/types';
+import { PRIORITY_CONFIG, Priority } from '@/lib/types';
 
 export default function WeeklyReportScreen() {
   const colors = useColors();
   const router = useRouter();
-  const { tasks, pomodoroSessions, dailyStats } = useTaskContext();
+  const { tasks, dailyStats } = useTaskContext();
 
   const weekStats = useMemo(() => {
     const today = new Date();
@@ -27,11 +27,9 @@ export default function WeeklyReportScreen() {
       return completedDate >= weekStart && completedDate <= weekEnd;
     });
 
-    // Get pomodoro sessions this week
-    const pomodorosThisWeek = pomodoroSessions.filter(s => {
-      if (s.type !== 'work') return false;
-      const sessionDate = new Date(s.completedAt);
-      return sessionDate >= weekStart && sessionDate <= weekEnd;
+    const createdThisWeek = tasks.filter(t => {
+      const createdDate = new Date(t.createdAt);
+      return createdDate >= weekStart && createdDate <= weekEnd;
     });
 
     // Get daily stats
@@ -40,9 +38,8 @@ export default function WeeklyReportScreen() {
       return statDate >= weekStart && statDate <= weekEnd;
     });
 
-    const totalFocusMinutes = pomodorosThisWeek.reduce((acc, s) => acc + s.duration, 0);
-    const totalFocusHours = Math.round(totalFocusMinutes / 60 * 10) / 10;
     const avgTasksPerDay = completedThisWeek.length / 7;
+    const openTasks = tasks.filter(t => t.status !== 'done').length;
 
     // Status distribution
     const statusDistribution = completedThisWeek.reduce((acc, task) => {
@@ -62,14 +59,14 @@ export default function WeeklyReportScreen() {
       weekStart: weekStart.toLocaleDateString('pt-BR'),
       weekEnd: weekEnd.toLocaleDateString('pt-BR'),
       completedTasks: completedThisWeek.length,
-      pomodoros: pomodorosThisWeek.length,
-      totalFocusHours,
+      createdTasks: createdThisWeek.length,
+      openTasks,
       avgTasksPerDay: Math.round(avgTasksPerDay * 10) / 10,
       statusDistribution,
       priorityDistribution,
       weekDailyStats,
     };
-  }, [tasks, pomodoroSessions, dailyStats]);
+  }, [tasks, dailyStats]);
 
   const dayLabels = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
   const today = new Date();
@@ -85,7 +82,6 @@ export default function WeeklyReportScreen() {
       day: dayLabels[i],
       date: dateStr,
       tasksCompleted: stat?.tasksCompleted || 0,
-      focusMinutes: stat?.focusMinutes || 0,
     };
   });
 
@@ -121,19 +117,19 @@ export default function WeeklyReportScreen() {
           </View>
 
           <View style={[styles.metricCard, { backgroundColor: colors.warning + '15' }]}>
-            <IconSymbol name="flame.fill" size={24} color={colors.warning} />
+            <IconSymbol name="plus.circle.fill" size={24} color={colors.warning} />
             <Text style={[styles.metricValue, { color: colors.foreground }]}>
-              {weekStats.pomodoros}
+              {weekStats.createdTasks}
             </Text>
-            <Text style={[styles.metricLabel, { color: colors.muted }]}>Pomodoros</Text>
+            <Text style={[styles.metricLabel, { color: colors.muted }]}>Tarefas Criadas</Text>
           </View>
 
           <View style={[styles.metricCard, { backgroundColor: colors.primary + '15' }]}>
-            <IconSymbol name="clock.fill" size={24} color={colors.primary} />
+            <IconSymbol name="checklist" size={24} color={colors.primary} />
             <Text style={[styles.metricValue, { color: colors.foreground }]}>
-              {weekStats.totalFocusHours}h
+              {weekStats.openTasks}
             </Text>
-            <Text style={[styles.metricLabel, { color: colors.muted }]}>Tempo Foco</Text>
+            <Text style={[styles.metricLabel, { color: colors.muted }]}>Tarefas Abertas</Text>
           </View>
 
           <View style={[styles.metricCard, { backgroundColor: colors.success + '15' }]}>

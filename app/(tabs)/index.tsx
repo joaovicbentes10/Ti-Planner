@@ -15,12 +15,10 @@ export default function HomeScreen() {
   const { 
     tasks, 
     projects, 
-    isLoading, 
     refreshData, 
     toggleTask,
     getTodayTasks,
     getOverdueTasks,
-    dailyStats,
   } = useTaskContext();
 
   const [refreshing, setRefreshing] = React.useState(false);
@@ -149,7 +147,7 @@ export default function HomeScreen() {
           <StatCard
             title="Em Progresso"
             value={stats.inProgressCount}
-            icon="timer"
+            icon="checklist"
             iconColor={colors.info}
           />
           <StatCard

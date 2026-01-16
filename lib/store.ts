@@ -1,22 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Task, Project, PomodoroSession, AppSettings, DailyStats, createTask, createProject } from './types';
+import { Task, Project, AppSettings, DailyStats, createTask, createProject } from './types';
 
 const STORAGE_KEYS = {
   TASKS: '@it_task_planner/tasks',
   PROJECTS: '@it_task_planner/projects',
-  POMODORO_SESSIONS: '@it_task_planner/pomodoro_sessions',
   SETTINGS: '@it_task_planner/settings',
   DAILY_STATS: '@it_task_planner/daily_stats',
 };
 
+const LEGACY_KEYS = ['@it_task_planner/pomodoro_sessions'];
+
 const DEFAULT_SETTINGS: AppSettings = {
   theme: 'system',
-  pomodoro: {
-    workDuration: 25,
-    shortBreakDuration: 5,
-    longBreakDuration: 15,
-    sessionsUntilLongBreak: 4,
-  },
   notifications: true,
 };
 
@@ -136,23 +131,6 @@ export async function deleteProject(projectId: string): Promise<boolean> {
   return true;
 }
 
-// Pomodoro Sessions
-export async function getPomodoroSessions(): Promise<PomodoroSession[]> {
-  return getItem<PomodoroSession[]>(STORAGE_KEYS.POMODORO_SESSIONS, []);
-}
-
-export async function addPomodoroSession(session: Omit<PomodoroSession, 'id' | 'completedAt'>): Promise<PomodoroSession> {
-  const sessions = await getPomodoroSessions();
-  const newSession: PomodoroSession = {
-    ...session,
-    id: Date.now().toString(36) + Math.random().toString(36).substr(2),
-    completedAt: new Date().toISOString(),
-  };
-  sessions.unshift(newSession);
-  await setItem(STORAGE_KEYS.POMODORO_SESSIONS, sessions);
-  return newSession;
-}
-
 // Settings
 export async function getSettings(): Promise<AppSettings> {
   return getItem<AppSettings>(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
@@ -174,14 +152,12 @@ export async function updateDailyStats(updates: Partial<Omit<DailyStats, 'date'>
   
   const todayStats: DailyStats = todayIndex >= 0 
     ? stats[todayIndex]
-    : { date: today, tasksCreated: 0, tasksCompleted: 0, pomodoroSessions: 0, focusMinutes: 0 };
+    : { date: today, tasksCreated: 0, tasksCompleted: 0 };
   
   const updatedStats: DailyStats = {
     ...todayStats,
     tasksCreated: todayStats.tasksCreated + (updates.tasksCreated || 0),
     tasksCompleted: todayStats.tasksCompleted + (updates.tasksCompleted || 0),
-    pomodoroSessions: todayStats.pomodoroSessions + (updates.pomodoroSessions || 0),
-    focusMinutes: todayStats.focusMinutes + (updates.focusMinutes || 0),
   };
   
   if (todayIndex >= 0) {
@@ -199,10 +175,9 @@ export async function updateDailyStats(updates: Partial<Omit<DailyStats, 'date'>
 
 // Export/Import
 export async function exportAllData(): Promise<string> {
-  const [tasks, projects, sessions, settings, stats] = await Promise.all([
+  const [tasks, projects, settings, stats] = await Promise.all([
     getTasks(),
     getProjects(),
-    getPomodoroSessions(),
     getSettings(),
     getDailyStats(),
   ]);
@@ -212,7 +187,6 @@ export async function exportAllData(): Promise<string> {
     exportedAt: new Date().toISOString(),
     tasks,
     projects,
-    pomodoroSessions: sessions,
     settings,
     dailyStats: stats,
   }, null, 2);
@@ -228,7 +202,6 @@ export async function importAllData(jsonString: string): Promise<boolean> {
     await Promise.all([
       saveTasks(data.tasks || []),
       saveProjects(data.projects || []),
-      setItem(STORAGE_KEYS.POMODORO_SESSIONS, data.pomodoroSessions || []),
       saveSettings(data.settings || DEFAULT_SETTINGS),
       setItem(STORAGE_KEYS.DAILY_STATS, data.dailyStats || []),
     ]);
@@ -242,5 +215,5 @@ export async function importAllData(jsonString: string): Promise<boolean> {
 
 // Clear all data
 export async function clearAllData(): Promise<void> {
-  await AsyncStorage.multiRemove(Object.values(STORAGE_KEYS));
+  await AsyncStorage.multiRemove([...Object.values(STORAGE_KEYS), ...LEGACY_KEYS]);
 }
